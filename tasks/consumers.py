@@ -8,8 +8,12 @@ class TaskConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-
-await self.channellayer.groupdiscard(self.groupname, self.channelname)
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+        data = json.loads(textdata)
+        await self.channellayer.groupsend(
+            self.groupname,
+            {"type": "taskupdate", "message": data.get("message", "Новая задача обновлена")}
+        )
 
     async def taskupdate(self, event):
         message = event.get("message", "")
