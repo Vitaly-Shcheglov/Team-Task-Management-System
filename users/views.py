@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 import bcrypt
 from .models import User
 from .serializers import UserSerializer, LoginSerializer
-from apps.core.utils import generate_token
+from core.utils import generate_token
 
 
 class RegisterView(generics.CreateAPIView):
@@ -40,4 +40,3 @@ class LogoutView(APIView):
 
     def post(self, request, *args, **kwargs):
         return Response({"detail": "Вы вышли из системы"}, status=status.HTTP200OK)
-    
