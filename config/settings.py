@@ -10,20 +10,31 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
+from datetime import timedelta
 from pathlib import Path
+import json
+
+from celery.schedules import crontab
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv()
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-p4rjzxvbetxl25nic#y!mvtv9bh4w8mm8tu+^f1qd1_#smm4!="
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True if os.getenv("DEBUG") == "True" else False
 
 ALLOWED_HOSTS = []
 
@@ -80,8 +91,12 @@ ASGIAPPLICATION = "config.routing.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("NAME", "team_task_db"),
+        "USER": os.getenv("USER", "postgres"),
+        "PASSWORD": os.getenv("PASSWORD", "cgfhnfr2009"),
+        "HOST": os.getenv("HOST", "localhost"),
+        "PORT": os.getenv("PORT", "5432"),
     }
 }
 
@@ -121,13 +136,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 AUTH_USER_MODEL = 'users.User'
+
+LOGIN_URL = "/users/login/"
 
 ASGI_APPLICATION = 'myproject.routing.application'
 CHANNEL_LAYERS = {
@@ -139,6 +165,35 @@ CHANNEL_LAYERS = {
     },
 }
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+BASE_REDIS = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", BASE_REDIS)
+
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", BASE_REDIS)
+CELERY_ACCEPT_CONTENT = json.loads(os.getenv("CELERY_ACCEPT_CONTENT", '["json"]'))
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+
+CELERY_BEAT_SCHEDULE = {
+    "send-reminders-every-minute": {
+        "task": "tasks.tasks.send_scheduled_reminders",
+        "schedule": crontab(),
+    },
+}
+
+CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "https://yourfrontend.com").split(",")
+
+CACHE_LOCATION = os.environ.get("REDIS_CACHE_URL", os.environ.get("REDIS_URL", "redis://localhost:6379/1"))
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": CACHE_LOCATION,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
