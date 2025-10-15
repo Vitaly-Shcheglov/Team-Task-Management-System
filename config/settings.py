@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "channels",
     "users",
     "tasks",
+    "access",
 ]
 
 MIDDLEWARE = [
