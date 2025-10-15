@@ -1,0 +1,93 @@
+:root {
+  --bg: #f5f6fa;
+  --primary: #4a90e2;
+  --text: #1e1e1e;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --success: #22c55e;
+  --error: #ef4444;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); }
+
+header {
+  padding: 1rem;
+  text-align: center;
+  background: white;
+  border-bottom: 1px solid var(--border);
+}
+
+main {
+  display: grid;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+section {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+}
+
+h2 { margin-top: 0; }
+
+.auth-section { /* стили для формы входа */ }
+.form-row { display: grid; gap: .5rem; }
+
+label { font-size: .9rem; color: var(--muted); }
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  padding: .6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+button {
+  padding: .6rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+}
+
+button:hover { opacity: 0.95; }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.task-form {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  margin-bottom: .5rem;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.task-list li {
+  padding: .5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.error {
+  color: var(--error);
+  min-height: 1.25em;
+}
