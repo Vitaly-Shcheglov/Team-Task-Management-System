@@ -1,16 +1,32 @@
 import asyncio
-from aiogram import Bot, Dispatcher, executor
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
+import logging
+from aiogram import Bot, Dispatcher
+from aiogram.filters import Command
+from aiogram.types import Message
+from dotenv import load_dotenv
 import os
-from handlers import taskshandler
 
-API_TOKEN = os.getenv("TELEGRAM_API_TOKEN", "ВАШ_TELEGRAM_API_TOKEN")
+load_dotenv()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+API_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 bot = Bot(token=API_TOKEN)
-storage = MemoryStorage()
-dp = Dispatcher(bot, storage=storage)
+dp = Dispatcher()
 
-taskshandler.register_handlers(dp)
+@dp.message(Command("start"))
+async def command_start_handler(message: Message) -> None:
+    await message.answer("Hello! I'm a bot created with aiogram.")
+    logger.info(f"Команда /start была вызвана пользователем: {message.from_user.username}")
 
-if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+async def main():
+    logger.info("Запуск бота...")
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        logger.error(f"Произошла ошибка: {e}")

@@ -9,8 +9,17 @@
   --error: #ef4444;
 }
 
-* { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); }
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
 
 header {
   padding: 1rem;
@@ -35,21 +44,52 @@ section {
   box-shadow: 0 2px 6px rgba(0,0,0,.04);
 }
 
-h2 { margin-top: 0; }
+h2 {
+  margin-top: 0;
+}
 
-.auth-section { /* стили для формы входа */ }
-.form-row { display: grid; gap: .5rem; }
+/* Стили для формы аутентификации */
+.auth-section {
+  display: block;
+  padding: 20px;
+}
 
-label { font-size: .9rem; color: var(--muted); }
+.auth-container {
+  max-width: 420px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background: #fff;
+}
 
-input[type="email"],
-input[type="password"],
-input[type="text"] {
-  padding: .6rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 1rem;
+.auth-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field {
+  margin-bottom: 12px;
+}
+
+.form-field label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.form-field input {
   width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 button {
@@ -61,12 +101,25 @@ button {
   cursor: pointer;
 }
 
-button:hover { opacity: 0.95; }
+button:hover {
+  opacity: 0.95;
+}
 
-.btn-ghost {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
+.btn {
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.form-switch {
+  margin-top: 8px;
+  font-size: 14px;
 }
 
 .task-form {
@@ -85,6 +138,12 @@ button:hover { opacity: 0.95; }
 .task-list li {
   padding: .5rem;
   border-bottom: 1px solid var(--border);
+}
+
+.auth-status {
+  margin-top: 12px;
+  min-height: 20px;
+  color: var(--error);
 }
 
 .error {
