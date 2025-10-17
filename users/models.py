@@ -12,28 +12,27 @@ class Role(models.Model):
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, extrafields=None):
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("Email должен быть указан")
         email = self.normalize_email(email)
-        extrafields = extrafields or {}
-        user = self.model(email=email, **extrafields)
+        user = self.model(email=email, **extra_fields)
         if password:
-            hashedpassword = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-            user.password = hashedpassword.decode('utf-8')
+            hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            user.password = hashed_password.decode('utf-8')
         else:
             user.set_unusable_password()
         user.is_active = True
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password, extrafields=None):
-        extrafields = extrafields or {}
-        extrafields.setdefault('is_staff', True)
-        extrafields.setdefault('is_superuser', True)
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
         from .models import Role
-        extrafields.setdefault('role', Role.objects.filter(name='admin').first())
-        return self.create_user(email, password, extrafields)
+        extra_fields.setdefault('role', Role.objects.filter(name='admin').first())
+        return self.create_user(email, password, **extra_fields)
 
 
 class User(AbstractBaseUser):
@@ -44,6 +43,7 @@ class User(AbstractBaseUser):
     password = models.CharField(max_length=255, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']

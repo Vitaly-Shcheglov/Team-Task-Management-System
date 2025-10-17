@@ -5,6 +5,9 @@ import bcrypt
 from .models import User
 from .serializers import UserSerializer, LoginSerializer
 from core.utils import generate_token
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -20,23 +23,29 @@ class LoginView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         email = serializer.validated_data.get('email')
         password = serializer.validated_data.get('password')
+
+        logger.info(f"Пользователь пытается войти: {email}")
+
         try:
             user = User.objects.get(email=email, is_active=True)
         except User.DoesNotExist:
-            return Response({"detail": "Неверные учетные данные"},
-                            status=status.HTTP_401_UNAUTHORIZED)
+            logger.warning(f"Пользователь не найден: {email}")
+            return Response({"detail": "Неверные учетные данные"}, status=status.HTTP_401_UNAUTHORIZED)
+
         if bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+            logger.info(f"Пароль для пользователя {user.email} верный.")
             token = generate_token(user)
             return Response({"token": token})
         else:
-            return Response({"detail": "Неверные учетные данные"},
-                            status=status.HTTP_401_UNAUTHORIZED)
+            logger.warning(f"Неверный пароль для пользователя {user.email}.")
+            return Response({"detail": "Неверные учетные данные"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutView(APIView):
-    permissionclasses = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
         return Response({"detail": "Вы вышли из системы"}, status=status.HTTP200OK)
