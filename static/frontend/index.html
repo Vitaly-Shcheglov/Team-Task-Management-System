@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Frontend Проект</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header>
@@ -14,7 +14,7 @@
   <main>
     <section id="auth-section" class="auth-section">
       <h2 id="auth-title">Вход</h2>
-      <form id="login-form" class="auth-form" autocomplete="off" novalidate>
+      <form id="login-form" class="auth-form" autocomplete="off" novalidate method="post" action="#">
         <div class="form-field">
           <label for="login-email">Email</label>
           <input type="email" id="login-email" name="email" placeholder="you@example.com" required />
@@ -29,10 +29,18 @@
         </p>
       </form>
 
-      <form id="register-form" class="auth-form" autocomplete="off" novalidate style="display: none;">
+      <form id="register-form" class="auth-form" autocomplete="off" novalidate method="post" action="#" style="display: none;">
         <div class="form-field">
-          <label for="reg-name">Имя</label>
-          <input type="text" id="reg-name" name="name" placeholder="Ваше имя" required />
+          <label for="reg-first-name">Имя</label>
+          <input type="text" id="reg-first-name" name="first_name" placeholder="Ваше имя" required />
+        </div>
+        <div class="form-field">
+          <label for="reg-middle-name">Отчество</label>
+          <input type="text" id="reg-middle-name" name="middle_name" placeholder="Ваше отчество" />
+        </div>
+        <div class="form-field">
+          <label for="reg-last-name">Фамилия</label>
+          <input type="text" id="reg-last-name" name="last_name" placeholder="Ваша фамилия" required />
         </div>
         <div class="form-field">
           <label for="reg-email">Email</label>
@@ -57,7 +65,7 @@
 
     <section id="tasks-section" class="tasks-section" hidden>
       <h2>Задачи</h2>
-      <form id="task-form" autocomplete="off" class="task-form">
+      <form id="task-form" autocomplete="off" class="task-form" method="post" action="#">
         <input type="text" id="task-input" placeholder="Добавить новую задачу" required />
         <button type="submit">Добавить</button>
       </form>
@@ -66,57 +74,23 @@
     </section>
   </main>
 
-  <script src="{% static 'frontend/main.js' %}"></script>
-  <script src="{% static 'frontend/auth.js' %}"></script>
-  <script src="{% static 'frontend/tasks.js' %}"></script>
+  <script src="/static/frontend/main.js"></script>
+  <script src="/static/frontend/auth.js"></script>
+  <script src="/static/frontend/tasks.js"></script>
 
   <script>
-    document.getElementById('show-register-link').onclick = function() {
+    document.getElementById('show-register-link').onclick = function(e) {
+      e.preventDefault();
       document.getElementById('login-form').style.display = 'none';
       document.getElementById('register-form').style.display = 'block';
       document.getElementById('auth-title').innerText = 'Регистрация';
     };
 
-    document.getElementById('show-login-link').onclick = function() {
+    document.getElementById('show-login-link').onclick = function(e) {
+      e.preventDefault();
       document.getElementById('register-form').style.display = 'none';
       document.getElementById('login-form').style.display = 'block';
       document.getElementById('auth-title').innerText = 'Вход';
-    };
-
-    document.getElementById('login-form').onsubmit = async function(event) {
-      event.preventDefault(); // Предотвращаем перезагрузку страницы
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
-
-      const response = await fetch('/api/users/login/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-      document.getElementById('auth-status').innerText = data.detail || "Успешный вход!";
-    };
-
-    document.getElementById('register-form').onsubmit = async function(event) {
-      event.preventDefault(); // Предотвращаем перезагрузку страницы
-      const name = document.getElementById('reg-name').value;
-      const email = document.getElementById('reg-email').value;
-      const password = document.getElementById('reg-password').value;
-      const password2 = document.getElementById('reg-password-repeat').value;
-
-      const response = await fetch('/api/users/register/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password, password2 }),
-      });
-
-      const data = await response.json();
-      document.getElementById('auth-status').innerText = data.detail || "Успешная регистрация!";
     };
   </script>
 </body>

@@ -7,22 +7,22 @@ export function login(email, password) {
       },
       body: JSON.stringify({ email, password }),
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Ошибка при входе');
-      }
-      return response.json();
-    })
-    .then(data => {
-      resolve({ success: true, user: data.user });
-    })
-    .catch(error => {
-      reject(error);
-    });
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Ошибка при входе');
+        }
+        return response.json();
+      })
+      .then(data => {
+        resolve({ success: true, user: data.user });
+      })
+      .catch(error => {
+        reject(error);
+      });
   });
 }
 
-(function() {
+document.addEventListener("DOMContentLoaded", function() {
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
   const loginLink = document.getElementById('show-register-link');
@@ -56,12 +56,14 @@ export function login(email, password) {
 
   registerForm?.addEventListener('submit', async function(e) {
     e.preventDefault();
-    const name = document.getElementById('reg-name').value.trim();
+    const first_name = document.getElementById('reg-first-name').value.trim();
+    const middle_name = document.getElementById('reg-middle-name').value.trim();
+    const last_name = document.getElementById('reg-last-name').value.trim();
     const email = document.getElementById('reg-email').value.trim();
     const password = document.getElementById('reg-password').value;
     const password2 = document.getElementById('reg-password-repeat').value;
 
-    if (!name || !email || !password || !password2) {
+    if (!first_name || !middle_name || !last_name || !email || !password || !password2) {
       statusEl.textContent = 'Пожалуйста, заполните все поля.';
       return;
     }
@@ -78,14 +80,14 @@ export function login(email, password) {
       const res = await fetch('/api/users/register/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, password2 })
+        body: JSON.stringify({ first_name, middle_name, last_name, email, password })
       });
       if (res.status === 201) {
         statusEl.textContent = 'Регистрация успешна. Можно войти в систему.';
         showLogin();
       } else {
         const data = await res.json().catch(() => ({}));
-        const msg = data?.message || 'Не удалось зарегистрироваться. Попробуйте позже.';
+        const msg = data.message || 'Не удалось зарегистрироваться. Попробуйте позже.';
         statusEl.textContent = msg;
       }
     } catch (err) {
@@ -105,7 +107,10 @@ export function login(email, password) {
 
     try {
       const res = await login(email, password);
-      if (res.success) {statusEl.textContent = 'Успешный вход!';
+      if (res.success) {
+        statusEl.textContent = 'Успешный вход!';
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('tasks-section').hidden = false;
       }
     } catch (error) {
       statusEl.textContent = 'Неверные учетные данные.';
@@ -113,4 +118,4 @@ export function login(email, password) {
   });
 
   showLogin();
-})();
+});
